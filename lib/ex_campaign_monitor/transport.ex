@@ -1,10 +1,9 @@
 defmodule ExCampaignMonitor.Transport do
   @base_api "https://api.createsend.com/api/v3.2"
-  @http_provider Application.get_env(:ex_campaign_monitor, :http_provider)
 
   @callback request(String.t(), map()) :: {:ok, HTTPoison.Response} | {:error, HTTPoison.Error}
   def request(path, body) do
-    @http_provider.post(@base_api <> path, Jason.encode!(body), headers())
+    http_provider().post(@base_api <> path, Jason.encode!(body), headers())
   end
 
   defp token do
@@ -20,4 +19,11 @@ defmodule ExCampaignMonitor.Transport do
   end
 
   defp campaign_monitor_api_key, do: Application.get_env(:ex_campaign_monitor, :api_key)
+
+  defp http_provider do
+    case Application.get_env(:ex_campaign_monitor, :http_provider) do
+      nil -> HTTPoison
+      provider -> provider
+    end
+  end
 end
