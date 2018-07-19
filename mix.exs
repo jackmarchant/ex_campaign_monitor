@@ -8,7 +8,15 @@ defmodule ExCampaignMonitor.MixProject do
       elixir: "~> 1.6",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      elixirc_paths: elixirc_paths(Mix.env())
+      elixirc_paths: elixirc_paths(Mix.env()),
+      description: description(),
+      package: package(),
+      name: "ExCampaignMonitor",
+      source_url: "https://github.com/jackmarchant/ex_campaign_monitor",
+      docs: [
+        main: "ExCampaignMonitor",
+        extras: ["README.md"]
+      ]
     ]
   end
 
@@ -27,7 +35,23 @@ defmodule ExCampaignMonitor.MixProject do
     [
       {:httpoison, "~> 1.2"},
       {:jason, "~> 1.1"},
-      {:mox, "~> 0.4", only: :test}
+      {:mox, "~> 0.4", only: :test},
+      {:ex_doc, "~> 0.18.0", only: :dev, runtime: false}
+    ]
+  end
+
+  defp description do
+    """
+    A wrapper for Campaign Monitor JSON API
+    """
+  end
+
+  defp package do
+    [
+      files: ["lib", "mix.exs", "README*", "LICENSE*"],
+      maintainers: ["Jack Marchant"],
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/jackmarchant/ex_campaign_monitor"}
     ]
   end
 end
