@@ -1,6 +1,8 @@
 defmodule ExCampaignMonitorTest do
   use ExUnit.Case
 
+  alias ExCampaignMonitor.Subscriber
+
   import Mox
 
   @subscriber_email "jack@jackmarchant.com"
@@ -24,7 +26,26 @@ defmodule ExCampaignMonitorTest do
       assert ExCampaignMonitor.add_subscriber(%{
                email: @subscriber_email,
                consent_to_track: "Yes"
-             }) == {:ok, http_response()}
+             }) == {:ok, %Subscriber{email: @subscriber_email, consent_to_track: "Yes"}}
+    end
+
+    test "update_subscriber/1" do
+      http_provider()
+      |> expect(:post, fn url, body, _headers ->
+        assert url == @list_url <> "?email=#{@subscriber_email}"
+        decoded_body = Jason.decode!(body)
+
+        assert %{"ConsentToTrack" => "No", "EmailAddress" => decoded_body["EmailAddress"]} ==
+                 decoded_body
+
+        {:ok, http_response()}
+      end)
+
+      assert ExCampaignMonitor.update_subscriber(%{
+               old_email: @subscriber_email,
+               new_email: "bob@email.com",
+               consent_to_track: "No"
+             }) == {:ok, %Subscriber{email: "bob@email.com", consent_to_track: "No"}}
     end
   end
 

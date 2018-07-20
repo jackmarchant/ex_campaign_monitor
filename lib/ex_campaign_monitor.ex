@@ -26,13 +26,24 @@ defmodule ExCampaignMonitor do
     def index(conn, params) do
       ExCampaignMonitor.add_subscriber(%{
         email: params["email"], # email address of the user you want to subscribe
-        consent_to_track: "Yes" | "No" # https://help.campaignmonitor.com/consent-to-track
+        consent_to_track: "Yes" # https://help.campaignmonitor.com/consent-to-track
       })
       send_resp(conn, "Subscriber added")
     end
   end
   """
-  alias ExCampaignMonitor.Lists
+  alias ExCampaignMonitor.Subscribers
 
-  defdelegate add_subscriber(email), to: Lists
+  defdelegate add_subscriber(subscriber), to: Subscribers
+
+  defdelegate update_subscriber(subscriber), to: Subscribers
+
+  # TODO:
+  # defdelegate add_subscribers(subscribers), to: Subscribers
+
+  # defdelegate remove_subscriber(subscriber), to: Subscribers
+
+  # defdelegate unsubscribe(subscriber), to: Subscribers
+
+  # defdelegate get_subscriber_by_email(email), to: Subscribers
 end

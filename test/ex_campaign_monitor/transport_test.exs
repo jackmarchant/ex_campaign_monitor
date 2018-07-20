@@ -14,7 +14,7 @@ defmodule ExCampaignMonitorTest.TransportTest do
       end)
 
       assert ExCampaignMonitor.Transport.request("/some_path", %{"hello" => "world"}) ==
-               {:ok, http_response()}
+               {:ok, %{"email" => "hi"}}
     end
   end
 
