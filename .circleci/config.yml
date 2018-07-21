@@ -22,4 +22,13 @@ jobs:
       - run: mix local.rebar --force
       - run: mix deps.get
       - run: mix compile
-      - run: mix test
+      - run: mkdir cover
+      - run:
+          name: Test
+          command: mix coveralls.json --trace
+      - run:
+          name: Upload Coverage
+          command: |
+            curl -s https://codecov.io/bash > .codecov
+            chmod +x .codecov
+            ./.codecov
