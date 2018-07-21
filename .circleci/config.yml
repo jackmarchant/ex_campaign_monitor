@@ -25,7 +25,7 @@ jobs:
       - run: mkdir cover
       - run:
           name: Test
-          command: mix coveralls.json --trace
+          command: MIX_ENV=test mix coveralls.json --trace
       - run:
           name: Upload Coverage
           command: |
