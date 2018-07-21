@@ -16,7 +16,8 @@ defmodule ExCampaignMonitor.MixProject do
       docs: [
         main: "ExCampaignMonitor",
         extras: ["README.md"]
-      ]
+      ],
+      test_coverage: [tool: ExCoveralls]
     ]
   end
 
@@ -36,7 +37,8 @@ defmodule ExCampaignMonitor.MixProject do
       {:httpoison, "~> 1.2"},
       {:jason, "~> 1.1"},
       {:mox, "~> 0.4", only: :test},
-      {:ex_doc, "~> 0.18.0", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.18.0", only: :dev, runtime: false},
+      {:excoveralls, "~> 0.9", only: :test}
     ]
   end
 

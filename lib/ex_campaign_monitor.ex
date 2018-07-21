@@ -38,9 +38,9 @@ defmodule ExCampaignMonitor do
 
   defdelegate update_subscriber(subscriber), to: Subscribers
 
-  # TODO:
-  # defdelegate add_subscribers(subscribers), to: Subscribers
+  defdelegate import_subscribers(subscribers), to: Subscribers
 
+  # TODO:
   # defdelegate remove_subscriber(subscriber), to: Subscribers
 
   # defdelegate unsubscribe(subscriber), to: Subscribers
