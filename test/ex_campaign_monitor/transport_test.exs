@@ -14,7 +14,17 @@ defmodule ExCampaignMonitorTest.TransportTest do
       end)
 
       assert ExCampaignMonitor.Transport.request("/some_path", %{"hello" => "world"}) ==
-               {:ok, http_response()}
+               {:ok, %{"email" => "hi"}}
+    end
+
+    test "request/2 error" do
+      http_provider()
+      |> expect(:post, fn _url, _body, _headers ->
+        {:error, http_error()}
+      end)
+
+      assert ExCampaignMonitor.Transport.request("/some_path", %{"hello" => "world"}) ==
+               {:error, "Something went wrong."}
     end
   end
 
@@ -26,6 +36,12 @@ defmodule ExCampaignMonitorTest.TransportTest do
       request_url: "https://api.createsend.com/api/v3.2/some_path",
       body: Jason.encode!(%{email: "hi"}),
       headers: ["Content-Type": "application/json"]
+    }
+  end
+
+  defp http_error do
+    %HTTPoison.Error{
+      reason: "Something went wrong."
     }
   end
 end
