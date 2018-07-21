@@ -43,8 +43,8 @@ end
 ## Features
 - [Subscribers](https://www.campaignmonitor.com/api/subscribers/)
   - [x] Adding a subscriber
-  - [ ] Updating a subscriber
-  - [ ] Importing many subscribers
+  - [x] Updating a subscriber
+  - [x] Importing many subscribers
   - [ ] Getting a subscriber's details
   - [ ] Unsubscribing a subscriber
   - [ ] Deleting a subscriber
