@@ -13,7 +13,7 @@ A simple wrapper for the Campaign Monitor JSON API.
 ```elixir
 def deps do
   [
-    {:ex_campaign_monitor, "~> 0.1"}
+    {:ex_campaign_monitor, "~> 0.2"}
   ]
 end
 ```

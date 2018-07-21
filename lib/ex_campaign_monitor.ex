@@ -6,7 +6,7 @@ defmodule ExCampaignMonitor do
   ```elixir
   def deps do
     [
-      {:ex_campaign_monitor, "~> 0.1"}
+      {:ex_campaign_monitor, "~> 0.2"}
     ]
   end
   ```
