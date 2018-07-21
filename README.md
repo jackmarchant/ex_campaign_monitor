@@ -1,5 +1,10 @@
 # ExCampaignMonitor
 
+[![CircleCI](https://circleci.com/gh/jackmarchant/ex_campaign_monitor.svg?style=svg)](https://circleci.com/gh/jackmarchant/ex_campaign_monitor)
+[![codecov](https://codecov.io/gh/jackmarchant/ex_campaign_monitor/branch/master/graph/badge.svg)](https://codecov.io/gh/jackmarchant/ex_campaign_monitor)
+[![Hex.pm version](https://img.shields.io/hexpm/v/ex_campaign_monitor.svg)](https://hex.pm/packages/ex_campaign_monitor)
+[![Hex.pm downloads](https://img.shields.io/hexpm/dt/ex_campaign_monitor.svg)](https://hex.pm/packages/ex_campaign_monitor)
+
 A simple wrapper for the Campaign Monitor JSON API.
 
 ## Installation
