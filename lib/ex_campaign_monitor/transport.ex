@@ -1,8 +1,19 @@
 defmodule ExCampaignMonitor.Transport do
   @base_api "https://api.createsend.com/api/v3.2"
 
-  @callback request(String.t(), map()) :: {:ok, map()} | {:error, String.t()}
-  def request(path, body) do
+  @doc """
+  Make a request to Campaign Monitor's API
+  """
+  @callback request(String.t(), Atom.t()) :: {:ok, map()} | {:error, String.t()}
+
+  def request(path, type) when type in [:get, :delete] do
+    http_provider()
+    |> apply(type, [@base_api <> path, headers()])
+    |> process_response()
+  end
+
+  @callback request(String.t(), Atom.t(), map()) :: {:ok, map()} | {:error, String.t()}
+  def request(path, :post, body) do
     http_provider().post(@base_api <> path, Jason.encode!(body), headers())
     |> process_response()
   end
@@ -23,8 +34,5 @@ defmodule ExCampaignMonitor.Transport do
   end
 
   defp campaign_monitor_api_key, do: Application.get_env(:ex_campaign_monitor, :api_key)
-
-  defp http_provider do
-    Application.get_env(:ex_campaign_monitor, :http_provider, HTTPoison)
-  end
+  defp http_provider, do: Application.get_env(:ex_campaign_monitor, :http_provider, HTTPoison)
 end

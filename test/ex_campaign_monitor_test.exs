@@ -114,13 +114,80 @@ defmodule ExCampaignMonitorTest do
                }
              ]) == {:error, "Something went wrong."}
     end
+
+    test "get_subscriber_by_email/1 success" do
+      email = "bob@hello.com"
+
+      http_provider()
+      |> expect(:get, fn url, _headers ->
+        assert url == @list_url <> ".json?email=#{email}&includetrackingpreference=true"
+        {:ok, http_response(%{"EmailAddress" => email, "ConsentToTrack" => "Yes"})}
+      end)
+
+      assert ExCampaignMonitor.get_subscriber_by_email(email) ==
+               {:ok, %Subscriber{email: email, consent_to_track: "Yes"}}
+    end
+
+    test "get_subscriber_by_email/1 error" do
+      http_provider()
+      |> expect(:get, fn _url, _headers ->
+        {:error, http_error()}
+      end)
+
+      assert ExCampaignMonitor.get_subscriber_by_email("person@email.com") ==
+               {:error, "Something went wrong."}
+    end
+
+    test "unsubscribe/1 success" do
+      email = "bob@hello.com"
+
+      http_provider()
+      |> expect(:post, fn url, body, _headers ->
+        decoded = Jason.decode!(body)
+        assert decoded["EmailAddress"] == email
+        assert url == @list_url <> "/unsubscribe.json"
+        {:ok, http_response(%{})}
+      end)
+
+      assert ExCampaignMonitor.unsubscribe(email) == {:ok, :unsubscribed}
+    end
+
+    test "unsubscribe/1 error" do
+      http_provider()
+      |> expect(:post, fn _url, _body, _headers ->
+        {:error, http_error()}
+      end)
+
+      assert ExCampaignMonitor.unsubscribe("person@email.com") ==
+               {:error, "Something went wrong."}
+    end
+
+    test "remove_subscriber/1" do
+      email = "bob@hello.com"
+
+      http_provider()
+      |> expect(:delete, fn url, _headers ->
+        assert url == @list_url <> ".json?email=#{email}"
+        {:ok, http_response(%{})}
+      end)
+
+      assert ExCampaignMonitor.remove_subscriber(email) == {:ok, :removed}
+    end
+
+    test "remove_subscriber/1 error" do
+      http_provider()
+      |> expect(:delete, fn _url, _headers ->
+        {:error, http_error()}
+      end)
+
+      assert ExCampaignMonitor.remove_subscriber("person@email.com") ==
+               {:error, "Something went wrong."}
+    end
   end
 
   defp http_provider, do: Application.get_env(:ex_campaign_monitor, :http_provider)
 
-  defp http_response do
-    http_response(%{email: @subscriber_email})
-  end
+  defp http_response, do: http_response(%{email: @subscriber_email})
 
   defp http_response(body) do
     %HTTPoison.Response{
