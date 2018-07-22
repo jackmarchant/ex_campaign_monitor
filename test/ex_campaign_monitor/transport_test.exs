@@ -8,12 +8,13 @@ defmodule ExCampaignMonitorTest.TransportTest do
   describe "Transport" do
     test "request/1" do
       http_provider()
-      |> expect(:get, fn url ->
+      |> expect(:get, fn url, _headers ->
         assert url == "https://api.createsend.com/api/v3.2/some_get_path"
         {:ok, http_response(%{"EmailAddress" => "person@email.com"})}
       end)
 
-      assert Transport.request("/some_get_path") == {:ok, %{"EmailAddress" => "person@email.com"}}
+      assert Transport.request("/some_get_path", :get) ==
+               {:ok, %{"EmailAddress" => "person@email.com"}}
     end
 
     test "request/2" do
@@ -25,7 +26,8 @@ defmodule ExCampaignMonitorTest.TransportTest do
         {:ok, http_response()}
       end)
 
-      assert Transport.request("/some_path", %{"hello" => "world"}) == {:ok, %{"email" => "hi"}}
+      assert Transport.request("/some_path", :post, %{"hello" => "world"}) ==
+               {:ok, %{"email" => "hi"}}
     end
 
     test "request/2 error" do
@@ -34,8 +36,23 @@ defmodule ExCampaignMonitorTest.TransportTest do
         {:error, http_error()}
       end)
 
-      assert Transport.request("/some_path", %{"hello" => "world"}) ==
+      assert Transport.request("/some_path", :post, %{"hello" => "world"}) ==
                {:error, "Something went wrong."}
+    end
+
+    test "basic authentication" do
+      http_provider()
+      |> expect(:get, fn _url, headers ->
+        assert headers == [
+                 Authorization: "Basic dGVzdF9hcGlfa2V5Ong=",
+                 "Content-Type": "application/json",
+                 Accept: "application/json"
+               ]
+
+        {:ok, http_response()}
+      end)
+
+      Transport.request("/testing-auth", :get)
     end
   end
 

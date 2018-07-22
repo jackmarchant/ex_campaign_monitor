@@ -14,7 +14,7 @@ defmodule ExCampaignMonitor.Subscribers do
   """
   def add_subscriber(%{email: email, consent_to_track: ctt} = subscriber) do
     "#{base_api_path()}.json"
-    |> Transport.request(to_cm_subscriber(subscriber))
+    |> Transport.request(:post, to_cm_subscriber(subscriber))
     |> case do
       {:ok, _} ->
         {:ok, %Subscriber{email: email, consent_to_track: ctt}}
@@ -30,7 +30,7 @@ defmodule ExCampaignMonitor.Subscribers do
   """
   def update_subscriber(%{old_email: old_email, new_email: new_email, consent_to_track: ctt}) do
     "#{base_api_path()}.json?email=#{old_email}"
-    |> Transport.request(to_cm_subscriber(%{email: new_email, consent_to_track: ctt}))
+    |> Transport.request(:post, to_cm_subscriber(%{email: new_email, consent_to_track: ctt}))
     |> case do
       {:ok, _} -> {:ok, %Subscriber{email: new_email, consent_to_track: ctt}}
       {:error, _} = error -> error
@@ -41,9 +41,9 @@ defmodule ExCampaignMonitor.Subscribers do
   @doc """
   Import subscribers
   """
-  def import_subscribers(subscribers) do
+  def import_subscribers(subscribers) when is_list(subscribers) do
     "#{base_api_path()}/import.json"
-    |> Transport.request(%{"Subscribers" => Enum.map(subscribers, &to_cm_subscriber/1)})
+    |> Transport.request(:post, %{"Subscribers" => Enum.map(subscribers, &to_cm_subscriber/1)})
     |> case do
       {:ok, %{"TotalNewSubscribers" => total}} -> {:ok, total}
       {:error, _} = error -> error
@@ -56,9 +56,32 @@ defmodule ExCampaignMonitor.Subscribers do
   """
   def get_subscriber(email, with_tracking_preference \\ true) do
     "#{base_api_path()}.json?email=#{email}&includetrackingpreference=#{with_tracking_preference}"
-    |> Transport.request()
+    |> Transport.request(:get)
     |> case do
       {:ok, response} -> {:ok, Subscriber.from_cm(response)}
+      {:error, _} = error -> error
+    end
+  end
+
+  @spec unsubscribe(String.t()) :: {:ok, :unsubscribed} | {:error, String.t()}
+  @doc """
+  Unsubscribe a subscriber
+  """
+  def unsubscribe(email) do
+    "#{base_api_path()}/unsubscribe.json"
+    |> Transport.request(:post, %{"EmailAddress" => email})
+    |> case do
+      {:ok, _} -> {:ok, :unsubscribed}
+      {:error, _} = error -> error
+    end
+  end
+
+  @spec remove_subscriber(String.t()) :: {:ok, :removed} | {:error, String.t()}
+  def remove_subscriber(email) do
+    "#{base_api_path()}.json?email=#{email}"
+    |> Transport.request(:delete)
+    |> case do
+      {:ok, _} -> {:ok, :removed}
       {:error, _} = error -> error
     end
   end

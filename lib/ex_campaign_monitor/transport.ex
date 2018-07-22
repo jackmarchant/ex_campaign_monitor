@@ -5,13 +5,15 @@ defmodule ExCampaignMonitor.Transport do
   Make a request to Campaign Monitor's API
   """
   @callback request(String.t(), Atom.t()) :: {:ok, map()} | {:error, String.t()}
-  def request(path) do
-    http_provider().get(@base_api <> path)
+
+  def request(path, type) when type in [:get, :delete] do
+    http_provider()
+    |> apply(type, [@base_api <> path, headers()])
     |> process_response()
   end
 
   @callback request(String.t(), Atom.t(), map()) :: {:ok, map()} | {:error, String.t()}
-  def request(path, body) do
+  def request(path, :post, body) do
     http_provider().post(@base_api <> path, Jason.encode!(body), headers())
     |> process_response()
   end

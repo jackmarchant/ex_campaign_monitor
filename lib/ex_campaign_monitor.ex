@@ -36,31 +36,76 @@ defmodule ExCampaignMonitor do
 
   @doc """
   Add a new subscriber to your list
+
+  ```elixir
+  ExCampaignMonitor.add_subscriber(%{email: "someone@domain.com", consent_to_track: "Yes"})
+  > {:ok, %Subscriber{email: "someone@domain", consent_to_track: "Yes"}}
+  ```
   """
   defdelegate add_subscriber(subscriber), to: Subscribers
 
   @doc """
   Update an existing subscriber from your list
+
+  ```elixir
+  ExCampaignMonitor.update_subscriber(%{
+    old_email: "someone@domain.com",
+    new_email: "person@domain.com",
+    consent_to_track: "Yes"
+  })
+  > {:ok, %Subscriber{email: "person@domain.com", consent_to_track: "Yes"}}
+  ```
   """
   defdelegate update_subscriber(subscriber), to: Subscribers
 
   @doc """
   Import many subscribers to your list
+
+  ```elixir
+  ExCampaignMonitor.import_subscribers([
+    %{
+      email: "someone@domain.com",
+      consent_to_track: "Yes"
+    },
+    %{
+      email: "person@domain.com",
+      consent_to_track: "No"
+    }
+  ])
+  > {:ok, 2}
+  ```
   """
   defdelegate import_subscribers(subscribers), to: Subscribers
 
   @doc """
   Get a single subscriber by their email address
+
+  ```elixir
+  ExCampaignMonitor.get_subscriber_by_email("person@domain.com")
+  > {:ok, %Subscriber{email: "person@domain.com", consent_to_track: "Yes"}}
+  ```
   """
   defdelegate get_subscriber_by_email(email),
     to: Subscribers,
     as: :get_subscriber
 
-  # @doc """
-  # Remove (delete) a single subscriber from your list
-  # """
-  # defdelegate remove_subscriber(subscriber), to: Subscribers
+  @doc """
+  Unsubscribe someone who is currently subscribed to your list
 
-  # TODO:
-  # defdelegate unsubscribe(subscriber), to: Subscribers
+  ```elixir
+  ExCampaignMonitor.unsubscribe("person@domain.com")
+  > {:ok, :unsubscribed}
+  ```
+  """
+  defdelegate unsubscribe(subscriber), to: Subscribers
+
+  @doc """
+  Remove (delete) a single subscriber from your list
+
+  ```elixir
+  ExCampaignMonitor.remove_subscriber("person@domain.com")
+  > {:ok, :removed}
+  ```
+  """
+  defdelegate remove_subscriber(subscriber), to: Subscribers
 end
