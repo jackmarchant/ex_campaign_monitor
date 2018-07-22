@@ -45,9 +45,9 @@ end
   - [x] Adding a subscriber
   - [x] Updating a subscriber
   - [x] Importing many subscribers
-  - [ ] Getting a subscriber's details
-  - [ ] Unsubscribing a subscriber
-  - [ ] Deleting a subscriber
+  - [x] Getting a subscriber
+  - [x] Unsubscribing a subscriber
+  - [x] Deleting a subscriber
 - [Lists](https://www.campaignmonitor.com/api/lists/)
   - [ ] Active subscribers
   - [ ] Creating a List
