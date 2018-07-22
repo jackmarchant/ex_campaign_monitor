@@ -50,6 +50,19 @@ defmodule ExCampaignMonitor.Subscribers do
     end
   end
 
+  @spec get_subscriber(String.t(), boolean()) :: {:ok, Subscriber.t()} | {:error, String.t()}
+  @doc """
+  Get details of a specific subscriber
+  """
+  def get_subscriber(email, with_tracking_preference \\ true) do
+    "#{base_api_path()}.json?email=#{email}&includetrackingpreference=#{with_tracking_preference}"
+    |> Transport.request()
+    |> case do
+      {:ok, response} -> {:ok, Subscriber.from_cm(response)}
+      {:error, _} = error -> error
+    end
+  end
+
   defp to_cm_subscriber(%{email: email, consent_to_track: ctt}) do
     %{
       "EmailAddress" => email,

@@ -8,5 +8,12 @@ defmodule ExCampaignMonitorTest.SubscriberTest do
       assert Subscriber.new(%{email: "jack@jackmarchant.com", consent_to_track: "No"}) ==
                %Subscriber{email: "jack@jackmarchant.com", consent_to_track: "No"}
     end
+
+    test "it can be created from campaign monitor API" do
+      assert Subscriber.from_cm(%{
+               "EmailAddress" => "jack@jackmarchant.com",
+               "ConsentToTrack" => "No"
+             }) == %Subscriber{email: "jack@jackmarchant.com", consent_to_track: "No"}
+    end
   end
 end

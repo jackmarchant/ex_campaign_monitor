@@ -34,16 +34,33 @@ defmodule ExCampaignMonitor do
   """
   alias ExCampaignMonitor.Subscribers
 
+  @doc """
+  Add a new subscriber to your list
+  """
   defdelegate add_subscriber(subscriber), to: Subscribers
 
+  @doc """
+  Update an existing subscriber from your list
+  """
   defdelegate update_subscriber(subscriber), to: Subscribers
 
+  @doc """
+  Import many subscribers to your list
+  """
   defdelegate import_subscribers(subscribers), to: Subscribers
 
-  # TODO:
+  @doc """
+  Get a single subscriber by their email address
+  """
+  defdelegate get_subscriber_by_email(email),
+    to: Subscribers,
+    as: :get_subscriber
+
+  # @doc """
+  # Remove (delete) a single subscriber from your list
+  # """
   # defdelegate remove_subscriber(subscriber), to: Subscribers
 
+  # TODO:
   # defdelegate unsubscribe(subscriber), to: Subscribers
-
-  # defdelegate get_subscriber_by_email(email), to: Subscribers
 end

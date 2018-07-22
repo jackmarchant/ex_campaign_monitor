@@ -114,13 +114,24 @@ defmodule ExCampaignMonitorTest do
                }
              ]) == {:error, "Something went wrong."}
     end
+
+    test "get_subscriber_by_email/1" do
+      email = "bob@hello.com"
+
+      http_provider()
+      |> expect(:get, fn url ->
+        assert url == @list_url <> ".json?email=#{email}&includetrackingpreference=true"
+        {:ok, http_response(%{"EmailAddress" => email, "ConsentToTrack" => "Yes"})}
+      end)
+
+      assert ExCampaignMonitor.get_subscriber_by_email(email) ==
+               {:ok, %Subscriber{email: email, consent_to_track: "Yes"}}
+    end
   end
 
   defp http_provider, do: Application.get_env(:ex_campaign_monitor, :http_provider)
 
-  defp http_response do
-    http_response(%{email: @subscriber_email})
-  end
+  defp http_response, do: http_response(%{email: @subscriber_email})
 
   defp http_response(body) do
     %HTTPoison.Response{

@@ -3,7 +3,19 @@ defmodule ExCampaignMonitorTest.TransportTest do
 
   import Mox
 
+  alias ExCampaignMonitor.Transport
+
   describe "Transport" do
+    test "request/1" do
+      http_provider()
+      |> expect(:get, fn url ->
+        assert url == "https://api.createsend.com/api/v3.2/some_get_path"
+        {:ok, http_response(%{"EmailAddress" => "person@email.com"})}
+      end)
+
+      assert Transport.request("/some_get_path") == {:ok, %{"EmailAddress" => "person@email.com"}}
+    end
+
     test "request/2" do
       http_provider()
       |> expect(:post, fn url, body, _headers ->
@@ -13,8 +25,7 @@ defmodule ExCampaignMonitorTest.TransportTest do
         {:ok, http_response()}
       end)
 
-      assert ExCampaignMonitor.Transport.request("/some_path", %{"hello" => "world"}) ==
-               {:ok, %{"email" => "hi"}}
+      assert Transport.request("/some_path", %{"hello" => "world"}) == {:ok, %{"email" => "hi"}}
     end
 
     test "request/2 error" do
@@ -23,18 +34,18 @@ defmodule ExCampaignMonitorTest.TransportTest do
         {:error, http_error()}
       end)
 
-      assert ExCampaignMonitor.Transport.request("/some_path", %{"hello" => "world"}) ==
+      assert Transport.request("/some_path", %{"hello" => "world"}) ==
                {:error, "Something went wrong."}
     end
   end
 
   defp http_provider, do: Application.get_env(:ex_campaign_monitor, :http_provider)
 
-  defp http_response do
+  defp http_response(body \\ %{email: "hi"}) do
     %HTTPoison.Response{
       status_code: 200,
       request_url: "https://api.createsend.com/api/v3.2/some_path",
-      body: Jason.encode!(%{email: "hi"}),
+      body: Jason.encode!(body),
       headers: ["Content-Type": "application/json"]
     }
   end
