@@ -121,11 +121,26 @@ defmodule ExCampaignMonitorTest do
       http_provider()
       |> expect(:get, fn url, _headers ->
         assert url == @list_url <> ".json?email=#{email}&includetrackingpreference=true"
-        {:ok, http_response(%{"EmailAddress" => email, "ConsentToTrack" => "Yes"})}
+
+        {:ok,
+         http_response(%{
+           "EmailAddress" => email,
+           "ConsentToTrack" => "Yes",
+           "Name" => "Jack Marchant",
+           "CustomFields" => [],
+           "State" => "active"
+         })}
       end)
 
       assert ExCampaignMonitor.get_subscriber_by_email(email) ==
-               {:ok, %Subscriber{email: email, consent_to_track: "Yes"}}
+               {:ok,
+                %Subscriber{
+                  email: email,
+                  consent_to_track: "Yes",
+                  name: "Jack Marchant",
+                  custom_fields: [],
+                  state: "active"
+                }}
     end
 
     test "get_subscriber_by_email/1 error" do
