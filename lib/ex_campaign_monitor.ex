@@ -32,7 +32,11 @@ defmodule ExCampaignMonitor do
     end
   end
   """
-  alias ExCampaignMonitor.Subscribers
+  alias ExCampaignMonitor.{Subscribers, Lists}
+
+  ###
+  ### Subscribers
+  ###
 
   @doc """
   Add a new subscriber to your list
@@ -108,4 +112,28 @@ defmodule ExCampaignMonitor do
   ```
   """
   defdelegate remove_subscriber(subscriber), to: Subscribers
+
+  ###
+  ### Lists
+  ###
+
+  @doc """
+  Create a new list
+
+  ```elixir
+  ExCampaignMonitor.create_list(%{title: "my list"})
+  > {:ok, %List{title: "my list"}}
+  ```
+  """
+  defdelegate create_list(list), to: Lists
+
+  @doc """
+  Get details for a List by ID
+
+  ```elixir
+  ExCampaignMonitor.get_list_by_id("a1a1a1a1")
+  > {:ok, %List{title: "my list", list_id: "a1a1a1a1"}}
+  ```
+  """
+  defdelegate get_list_by_id(id), to: Lists
 end
