@@ -33,7 +33,14 @@ defmodule MyApp.PageController do
   def index(conn, params) do
     ExCampaignMonitor.add_subscriber(%{
       email: params["email"], # email address of the user you want to subscribe
-      consent_to_track: "Yes" | "No" # https://help.campaignmonitor.com/consent-to-track
+      consent_to_track: params["consent], # https://help.campaignmonitor.com/consent-to-track
+      name: params["name"],
+      custom_fields: [
+        %{
+          key: "website",
+          value: params["website"]
+        }
+      ]
     })
     send_resp(conn, "Subscriber added")
   end

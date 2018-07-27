@@ -14,7 +14,7 @@ defmodule ExCampaignMonitor.Subscribers do
   """
   def add_subscriber(%{email: email, consent_to_track: ctt} = subscriber) do
     "#{base_api_path()}.json"
-    |> Transport.request(:post, to_cm_subscriber(subscriber))
+    |> Transport.request(:post, Subscriber.to_cm(subscriber))
     |> case do
       {:ok, _} ->
         {:ok, %Subscriber{email: email, consent_to_track: ctt}}
@@ -30,7 +30,7 @@ defmodule ExCampaignMonitor.Subscribers do
   """
   def update_subscriber(%{old_email: old_email, new_email: new_email, consent_to_track: ctt}) do
     "#{base_api_path()}.json?email=#{old_email}"
-    |> Transport.request(:post, to_cm_subscriber(%{email: new_email, consent_to_track: ctt}))
+    |> Transport.request(:post, Subscriber.to_cm(%{email: new_email, consent_to_track: ctt}))
     |> case do
       {:ok, _} -> {:ok, %Subscriber{email: new_email, consent_to_track: ctt}}
       {:error, _} = error -> error
@@ -43,7 +43,7 @@ defmodule ExCampaignMonitor.Subscribers do
   """
   def import_subscribers(subscribers) when is_list(subscribers) do
     "#{base_api_path()}/import.json"
-    |> Transport.request(:post, %{"Subscribers" => Enum.map(subscribers, &to_cm_subscriber/1)})
+    |> Transport.request(:post, %{"Subscribers" => Enum.map(subscribers, &Subscriber.to_cm/1)})
     |> case do
       {:ok, %{"TotalNewSubscribers" => total}} -> {:ok, total}
       {:error, _} = error -> error
@@ -85,15 +85,6 @@ defmodule ExCampaignMonitor.Subscribers do
       {:error, _} = error -> error
     end
   end
-
-  defp to_cm_subscriber(%{email: email, consent_to_track: ctt}) do
-    %{
-      "EmailAddress" => email,
-      "ConsentToTrack" => ctt
-    }
-  end
-
-  defp to_cm_subscriber(_), do: nil
 
   defp base_api_path, do: "/subscribers/#{campaign_monitor_list_id()}"
 
