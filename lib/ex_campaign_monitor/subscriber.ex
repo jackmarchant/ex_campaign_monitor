@@ -27,27 +27,11 @@ defmodule ExCampaignMonitor.Subscriber do
     })
   end
 
-  @doc """
-  Create an API request format for Campaign Monitor
-  """
-  def to_cm(%__MODULE__{
-        email: email,
-        consent_to_track: ctt,
-        name: name,
-        custom_fields: custom_fields,
-        state: state
-      }) do
-    %{
-      "EmailAddress" => email,
-      "ConsentToTrack" => ctt,
-      "Name" => name,
-      "CustomFields" => convert_keys(custom_fields, &key_to_string/1),
-      "State" => state
-    }
+  defp key_to_atom(str) do
+    str
+    |> String.downcase()
+    |> String.to_atom()
   end
-
-  defp key_to_atom(str), do: str |> String.downcase() |> String.to_atom()
-  defp key_to_string(str), do: str |> Atom.to_string() |> String.capitalize()
 
   defp convert_keys(list, converter) when is_list(list) do
     Enum.map(list, &convert_keys(&1, converter))
