@@ -4,16 +4,60 @@ defmodule ExCampaignMonitorTest.SubscriberTest do
   alias ExCampaignMonitor.Subscriber
 
   describe "Subscriber" do
-    test "it can be created" do
-      assert Subscriber.new(%{email: "jack@jackmarchant.com", consent_to_track: "No"}) ==
-               %Subscriber{email: "jack@jackmarchant.com", consent_to_track: "No"}
+    setup do
+      custom_fields = [
+        %{
+          key: "website",
+          value: "https://www.jackmarchant.com"
+        },
+        %{
+          key: "interests",
+          value: "Elixir"
+        }
+      ]
+
+      %{custom_fields: custom_fields}
     end
 
-    test "it can be created from campaign monitor API" do
+    test "it can be created", %{custom_fields: custom_fields} do
+      assert Subscriber.new(%{
+               name: "Jack Marchant",
+               email: "jack@jackmarchant.com",
+               consent_to_track: "No",
+               custom_fields: custom_fields,
+               state: "active"
+             }) == %Subscriber{
+               name: "Jack Marchant",
+               custom_fields: custom_fields,
+               email: "jack@jackmarchant.com",
+               consent_to_track: "No",
+               state: "active"
+             }
+    end
+
+    test "it can be created from campaign monitor API", %{custom_fields: custom_fields} do
       assert Subscriber.from_cm(%{
                "EmailAddress" => "jack@jackmarchant.com",
-               "ConsentToTrack" => "No"
-             }) == %Subscriber{email: "jack@jackmarchant.com", consent_to_track: "No"}
+               "ConsentToTrack" => "No",
+               "Name" => "Jack Marchant",
+               "CustomFields" => [
+                 %{
+                   "Key" => "website",
+                   "Value" => "https://www.jackmarchant.com"
+                 },
+                 %{
+                   "Key" => "interests",
+                   "Value" => "Elixir"
+                 }
+               ],
+               "State" => "active"
+             }) == %Subscriber{
+               email: "jack@jackmarchant.com",
+               consent_to_track: "No",
+               name: "Jack Marchant",
+               custom_fields: custom_fields,
+               state: "active"
+             }
     end
   end
 end
