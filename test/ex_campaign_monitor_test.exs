@@ -2,19 +2,22 @@ defmodule ExCampaignMonitorTest do
   use ExUnit.Case
 
   alias ExCampaignMonitor.Subscriber
+  alias ExCampaignMonitor.List, as: ExCMList
 
   import Mox
 
   @subscriber_email "jack@jackmarchant.com"
-  @list_url "https://api.createsend.com/api/v3.2/subscribers/test_list_id"
+  @subscribers_url "https://api.createsend.com/api/v3.2/subscribers/test_list_id"
+  @lists_url "https://api.createsend.com/api/v3.2/lists/test_client_id"
+  @list_by_id_url "https://api.createsend.com/api/v3.2/lists/"
 
-  describe "ExCampaignMonitor" do
+  describe "ExCampaignMonitor Subscribers" do
     setup :verify_on_exit!
 
     test "add_subscriber/1 success with minimum fields" do
       http_provider()
       |> expect(:post, fn url, body, _headers ->
-        assert url == @list_url <> ".json"
+        assert url == @subscribers_url <> ".json"
         decoded_body = Jason.decode!(body)
 
         assert %{
@@ -34,7 +37,7 @@ defmodule ExCampaignMonitorTest do
     test "add_subscriber/1 success with all fields" do
       http_provider()
       |> expect(:post, fn url, body, _headers ->
-        assert url == @list_url <> ".json"
+        assert url == @subscribers_url <> ".json"
         decoded_body = Jason.decode!(body)
 
         assert %{
@@ -69,7 +72,7 @@ defmodule ExCampaignMonitorTest do
     test "add_subscriber/1 error" do
       http_provider()
       |> expect(:post, fn url, _body, _headers ->
-        assert url == @list_url <> ".json"
+        assert url == @subscribers_url <> ".json"
 
         {:error, http_error()}
       end)
@@ -81,7 +84,7 @@ defmodule ExCampaignMonitorTest do
     test "update_subscriber/1" do
       http_provider()
       |> expect(:post, fn url, body, _headers ->
-        assert url == @list_url <> ".json?email=#{@subscriber_email}"
+        assert url == @subscribers_url <> ".json?email=#{@subscriber_email}"
         decoded_body = Jason.decode!(body)
 
         assert %{"ConsentToTrack" => "No", "EmailAddress" => decoded_body["EmailAddress"]} ==
@@ -113,7 +116,7 @@ defmodule ExCampaignMonitorTest do
     test "import_subscribers/1" do
       http_provider()
       |> expect(:post, fn url, body, _headers ->
-        assert url == @list_url <> "/import.json"
+        assert url == @subscribers_url <> "/import.json"
         decoded_body = Jason.decode!(body)
 
         email =
@@ -157,7 +160,7 @@ defmodule ExCampaignMonitorTest do
 
       http_provider()
       |> expect(:get, fn url, _headers ->
-        assert url == @list_url <> ".json?email=#{email}&includetrackingpreference=true"
+        assert url == @subscribers_url <> ".json?email=#{email}&includetrackingpreference=true"
 
         {:ok,
          http_response(%{
@@ -197,7 +200,7 @@ defmodule ExCampaignMonitorTest do
       |> expect(:post, fn url, body, _headers ->
         decoded = Jason.decode!(body)
         assert decoded["EmailAddress"] == email
-        assert url == @list_url <> "/unsubscribe.json"
+        assert url == @subscribers_url <> "/unsubscribe.json"
         {:ok, http_response(%{})}
       end)
 
@@ -219,7 +222,7 @@ defmodule ExCampaignMonitorTest do
 
       http_provider()
       |> expect(:delete, fn url, _headers ->
-        assert url == @list_url <> ".json?email=#{email}"
+        assert url == @subscribers_url <> ".json?email=#{email}"
         {:ok, http_response(%{})}
       end)
 
@@ -237,6 +240,77 @@ defmodule ExCampaignMonitorTest do
     end
   end
 
+  describe "ExCampaignMonitor Lists" do
+    setup :verify_on_exit!
+
+    test "create_list/1 success with minimum fields" do
+      http_provider()
+      |> expect(:post, fn url, body, _headers ->
+        assert url == @lists_url <> ".json"
+        decoded_body = Jason.decode!(body)
+
+        assert %{"Title" => "this is my list title"} == decoded_body
+
+        {:ok, http_response()}
+      end)
+
+      assert ExCampaignMonitor.create_list(%{
+               title: "this is my list title"
+             }) == {:ok, %ExCMList{title: "this is my list title"}}
+    end
+
+    test "create_list/1 error" do
+      http_provider()
+      |> expect(:post, fn url, _body, _headers ->
+        assert url == @lists_url <> ".json"
+
+        {:error, http_error()}
+      end)
+
+      assert ExCampaignMonitor.create_list(%{title: nil}) == {:error, "Something went wrong."}
+    end
+
+    test "get_list_by_id/1 success" do
+      list_id = "a1a1a1a1"
+
+      http_provider()
+      |> expect(:get, fn url, _headers ->
+        assert url == @list_by_id_url <> list_id <> ".json"
+
+        {:ok,
+         http_response(%{
+           "Title" => "my cool list",
+           "ListID" => list_id,
+           "ConfirmedOptIn" => true,
+           "UnsubscribePage" => "http://www.example.com/unsubscribed.html",
+           "UnsubscribeSetting" => "AllClientLists",
+           "ConfirmationSuccessPage" => "http://www.example.com/joined.html"
+         })}
+      end)
+
+      assert ExCampaignMonitor.get_list_by_id(list_id) ==
+               {:ok,
+                %ExCMList{
+                  title: "my cool list",
+                  list_id: list_id,
+                  confirmed_opt_in: true,
+                  unsubscribe_page: "http://www.example.com/unsubscribed.html",
+                  unsubscribe_setting: "AllClientLists",
+                  confirmation_success_page: "http://www.example.com/joined.html"
+                }}
+    end
+
+    test "get_list_by_id/1 error" do
+      http_provider()
+      |> expect(:get, fn _url, _headers ->
+        {:error, http_error()}
+      end)
+
+      assert ExCampaignMonitor.get_list_by_id("list-id-does-not-exist") ==
+               {:error, "Something went wrong."}
+    end
+  end
+
   defp http_provider, do: Application.get_env(:ex_campaign_monitor, :http_provider)
 
   defp http_response, do: http_response(%{email: @subscriber_email})
@@ -244,7 +318,7 @@ defmodule ExCampaignMonitorTest do
   defp http_response(body) do
     %HTTPoison.Response{
       status_code: 200,
-      request_url: @list_url,
+      request_url: @subscribers_url,
       body: Jason.encode!(body),
       headers: ["Content-Type": "application/json"]
     }
