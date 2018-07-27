@@ -11,14 +11,16 @@ defmodule ExCampaignMonitorTest do
   describe "ExCampaignMonitor" do
     setup :verify_on_exit!
 
-    test "add_subscriber/1 success" do
+    test "add_subscriber/1 success with minimum fields" do
       http_provider()
       |> expect(:post, fn url, body, _headers ->
         assert url == @list_url <> ".json"
         decoded_body = Jason.decode!(body)
 
-        assert %{"ConsentToTrack" => "Yes", "EmailAddress" => decoded_body["EmailAddress"]} ==
-                 decoded_body
+        assert %{
+                 "ConsentToTrack" => "Yes",
+                 "EmailAddress" => decoded_body["EmailAddress"]
+               } == decoded_body
 
         {:ok, http_response()}
       end)
@@ -26,6 +28,41 @@ defmodule ExCampaignMonitorTest do
       assert ExCampaignMonitor.add_subscriber(%{
                email: @subscriber_email,
                consent_to_track: "Yes"
+             }) == {:ok, %Subscriber{email: @subscriber_email, consent_to_track: "Yes"}}
+    end
+
+    test "add_subscriber/1 success with all fields" do
+      http_provider()
+      |> expect(:post, fn url, body, _headers ->
+        assert url == @list_url <> ".json"
+        decoded_body = Jason.decode!(body)
+
+        assert %{
+                 "ConsentToTrack" => "Yes",
+                 "EmailAddress" => decoded_body["EmailAddress"],
+                 "CustomFields" => [
+                   %{
+                     "Key" => "website",
+                     "Value" => "https://www.jackmarchant.com"
+                   }
+                 ],
+                 "Name" => "Jack"
+               } == decoded_body
+
+        {:ok, http_response()}
+      end)
+
+      assert ExCampaignMonitor.add_subscriber(%{
+               email: @subscriber_email,
+               consent_to_track: "Yes",
+               name: "Jack",
+               state: "active",
+               custom_fields: [
+                 %{
+                   key: "website",
+                   value: "https://www.jackmarchant.com"
+                 }
+               ]
              }) == {:ok, %Subscriber{email: @subscriber_email, consent_to_track: "Yes"}}
     end
 

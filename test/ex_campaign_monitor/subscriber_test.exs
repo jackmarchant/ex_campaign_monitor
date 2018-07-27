@@ -59,5 +59,28 @@ defmodule ExCampaignMonitorTest.SubscriberTest do
                state: "active"
              }
     end
+
+    test "it can be created to match API request format", %{custom_fields: custom_fields} do
+      assert Subscriber.to_cm(%Subscriber{
+               email: "jack@jackmarchant.com",
+               consent_to_track: "No",
+               name: "Jack Marchant",
+               custom_fields: custom_fields
+             }) == %{
+               "EmailAddress" => "jack@jackmarchant.com",
+               "ConsentToTrack" => "No",
+               "Name" => "Jack Marchant",
+               "CustomFields" => [
+                 %{
+                   "Key" => "website",
+                   "Value" => "https://www.jackmarchant.com"
+                 },
+                 %{
+                   "Key" => "interests",
+                   "Value" => "Elixir"
+                 }
+               ]
+             }
+    end
   end
 end
