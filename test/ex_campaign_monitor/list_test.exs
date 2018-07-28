@@ -37,5 +37,34 @@ defmodule ExCampaignMonitorTest.ListTest do
                "Title" => "my list"
              }
     end
+
+    test "it can be created for active subscribers list" do
+      subscribers = [
+        %{
+          "EmailAddress" => "jack@jackmarchant.com",
+          "ConsentToTrack" => "No",
+          "Name" => "Jack Marchant",
+          "CustomFields" => [
+            %{
+              "Key" => "website",
+              "Value" => "https://www.jackmarchant.com"
+            }
+          ],
+          "State" => "active"
+        }
+      ]
+
+      assert ExCMList.from_cm(%{"Results" => subscribers}) == %ExCMList{
+               active_subscribers: [
+                 %ExCampaignMonitor.Subscriber{
+                   consent_to_track: "No",
+                   custom_fields: [%{key: "website", value: "https://www.jackmarchant.com"}],
+                   email: "jack@jackmarchant.com",
+                   name: "Jack Marchant",
+                   state: "active"
+                 }
+               ]
+             }
+    end
   end
 end

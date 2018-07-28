@@ -53,6 +53,19 @@ defmodule ExCampaignMonitor.Lists do
     end
   end
 
+  @spec get_active_subscribers(String.t()) :: {:ok, List.t()} | {:error, String.t()}
+  @doc """
+  Get a list with active subscribers
+  """
+  def get_active_subscribers(list_id) do
+    "/lists/#{list_id}.json"
+    |> Transport.request(:get)
+    |> case do
+      {:ok, response} -> {:ok, List.from_cm(response)}
+      {:error, _} = error -> error
+    end
+  end
+
   defp base_api_path, do: "/lists/#{campaign_monitor_client_id()}"
 
   defp campaign_monitor_client_id, do: Application.get_env(:ex_campaign_monitor, :client_id)

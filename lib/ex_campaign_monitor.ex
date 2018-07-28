@@ -136,4 +136,14 @@ defmodule ExCampaignMonitor do
   ```
   """
   defdelegate get_list_by_id(id), to: Lists
+
+  @doc """
+  Get active subscribers for a list
+
+  ```elixir
+  ExCampaignMonitor.get_active_subscribers("a1a1a1a1")
+  > {:ok, %List{list_id: "a1a1a1a1"}, subscribers: [%Subscriber{status: "active"}]}
+  ```
+  """
+  defdelegate get_active_subscribers(id), to: Lists
 end
