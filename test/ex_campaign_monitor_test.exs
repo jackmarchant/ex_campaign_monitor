@@ -270,7 +270,7 @@ defmodule ExCampaignMonitorTest do
       assert ExCampaignMonitor.create_list(%{title: nil}) == {:error, "Something went wrong."}
     end
 
-    test "get_list_by_id/1 success" do
+    test "get_active_subscribers/1 success" do
       list_id = "a1a1a1a1"
 
       http_provider()
@@ -307,6 +307,57 @@ defmodule ExCampaignMonitorTest do
       end)
 
       assert ExCampaignMonitor.get_list_by_id("list-id-does-not-exist") ==
+               {:error, "Something went wrong."}
+    end
+
+    test "get_list_by_id/1 success" do
+      list_id = "a1a1a1a1"
+
+      http_provider()
+      |> expect(:get, fn url, _headers ->
+        assert url == @list_by_id_url <> list_id <> ".json"
+
+        {:ok,
+         http_response(%{
+           "Results" => [
+             %{
+               "EmailAddress" => "jack@jackmarchant.com",
+               "ConsentToTrack" => "No",
+               "Name" => "Jack Marchant",
+               "CustomFields" => [
+                 %{
+                   "Key" => "website",
+                   "Value" => "https://www.jackmarchant.com"
+                 }
+               ],
+               "State" => "active"
+             }
+           ]
+         })}
+      end)
+
+      assert ExCampaignMonitor.get_active_subscribers(list_id) ==
+               {:ok,
+                %ExCMList{
+                  active_subscribers: [
+                    %ExCampaignMonitor.Subscriber{
+                      consent_to_track: "No",
+                      custom_fields: [%{key: "website", value: "https://www.jackmarchant.com"}],
+                      email: "jack@jackmarchant.com",
+                      name: "Jack Marchant",
+                      state: "active"
+                    }
+                  ]
+                }}
+    end
+
+    test "get_active_subscribers/1 error" do
+      http_provider()
+      |> expect(:get, fn _url, _headers ->
+        {:error, http_error()}
+      end)
+
+      assert ExCampaignMonitor.get_active_subscribers("list-id-does-not-exist") ==
                {:error, "Something went wrong."}
     end
   end

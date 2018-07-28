@@ -3,13 +3,16 @@ defmodule ExCampaignMonitor.List do
   A List in Campaign Monitor represents a group of subscribers
   """
 
+  alias ExCampaignMonitor.Subscriber
+
   defstruct [
     :title,
     :confirmed_opt_in,
     :unsubscribe_page,
     :unsubscribe_setting,
     :list_id,
-    :confirmation_success_page
+    :confirmation_success_page,
+    :active_subscribers
   ]
 
   @doc """
@@ -37,6 +40,14 @@ defmodule ExCampaignMonitor.List do
       unsubscribe_setting: unsubscribe_setting,
       list_id: list_id,
       confirmation_success_page: confirmation_success_page
+    })
+  end
+
+  def from_cm(%{
+        "Results" => subscribers
+      }) do
+    new(%{
+      active_subscribers: Enum.map(subscribers, &Subscriber.from_cm/1)
     })
   end
 
