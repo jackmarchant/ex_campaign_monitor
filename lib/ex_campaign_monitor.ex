@@ -135,7 +135,7 @@ defmodule ExCampaignMonitor do
   > {:ok, %List{title: "my list", list_id: "a1a1a1a1"}}
   ```
   """
-  defdelegate get_list_by_id(id), to: Lists
+  defdelegate get_list_by_id(list_id), to: Lists
 
   @doc """
   Get active subscribers for a list
@@ -145,5 +145,25 @@ defmodule ExCampaignMonitor do
   > {:ok, %List{list_id: "a1a1a1a1"}, subscribers: [%Subscriber{status: "active"}]}
   ```
   """
-  defdelegate get_active_subscribers(id), to: Lists
+  defdelegate get_active_subscribers(list_id), to: Lists
+
+  @doc """
+  Create a webhook for a list
+
+  ```elixir
+  ExCampaignMonitor.create_webhook("a1a1a1a1", ["Subscribe"], "http://mywebsite.com/subscribe", "json")
+  > {:ok, "webhook_id-982u981u298u298u2e9u289e"}
+  ```
+  """
+  defdelegate create_webhook(list_id, events, url, payload_format \\ "json"), to: Lists
+
+  @doc """
+  Delete a webhook by webhook_id
+
+  ```elixir
+  ExCampaignMonitor.delete_webhook("a1a1a1a1", "webhook_id-982u981u298u298u2e9u289e")
+  > {:ok, :webhook_deleted}
+  ```
+  """
+  defdelegate delete_webhook(list_id, webhook_id), to: Lists
 end

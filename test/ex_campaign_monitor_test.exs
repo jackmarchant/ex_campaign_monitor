@@ -360,6 +360,67 @@ defmodule ExCampaignMonitorTest do
       assert ExCampaignMonitor.get_active_subscribers("list-id-does-not-exist") ==
                {:error, "Something went wrong."}
     end
+
+    test "create_webhook/3 success" do
+      list_id = "a1a1a1a1"
+
+      http_provider()
+      |> expect(:post, fn url, body, _headers ->
+        assert url == @list_by_id_url <> list_id <> "/webhooks" <> ".json"
+        decoded_body = Jason.decode!(body)
+        assert decoded_body["Events"] == ["Subscribe"]
+        assert decoded_body["Url"] == "http://example.com/subscribe"
+        assert decoded_body["PayloadFormat"] == "json"
+
+        {:ok, http_response("982u981u298u298u2e9u289e")}
+      end)
+
+      assert ExCampaignMonitor.create_webhook(
+               list_id,
+               ["Subscribe"],
+               "http://example.com/subscribe"
+             ) == {:ok, "982u981u298u298u2e9u289e"}
+    end
+
+    test "create_webhook/4 error" do
+      http_provider()
+      |> expect(:post, fn _url, body, _headers ->
+        decoded_body = Jason.decode!(body)
+        assert decoded_body["PayloadFormat"] == "unsupported-format"
+        {:error, http_error()}
+      end)
+
+      assert ExCampaignMonitor.create_webhook(
+               "list-id-does-not-exist",
+               [],
+               "no-url",
+               "unsupported-format"
+             ) == {:error, "Something went wrong."}
+    end
+
+    test "delete_webhook/2 success" do
+      list_id = "a1a1a1a1"
+      webhook_id = "982u981u298u298u2e9u289e"
+
+      http_provider()
+      |> expect(:delete, fn url, _headers ->
+        assert url == @list_by_id_url <> list_id <> "/webhooks/" <> webhook_id <> ".json"
+
+        {:ok, http_response()}
+      end)
+
+      assert ExCampaignMonitor.delete_webhook(list_id, webhook_id) == {:ok, :webhook_deleted}
+    end
+
+    test "delete_webhook/2 error" do
+      http_provider()
+      |> expect(:delete, fn _url, _headers ->
+        {:error, http_error()}
+      end)
+
+      assert ExCampaignMonitor.delete_webhook("list-id-does-not-exist", "webhook-id-invalid") ==
+               {:error, "Something went wrong."}
+    end
   end
 
   defp http_provider, do: Application.get_env(:ex_campaign_monitor, :http_provider)

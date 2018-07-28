@@ -66,6 +66,37 @@ defmodule ExCampaignMonitor.Lists do
     end
   end
 
+  @spec create_webhook(String.t(), list(String.t()), String.t(), String.t()) ::
+          {:ok, String.t()} | {:error, String.t()}
+  @doc """
+  Create a webhook for a list
+  """
+  def create_webhook(list_id, events, url, payload_format \\ "json") when is_list(events) do
+    "/lists/#{list_id}/webhooks.json"
+    |> Transport.request(:post, %{
+      "Events" => events,
+      "Url" => url,
+      "PayloadFormat" => payload_format
+    })
+    |> case do
+      {:ok, webhook_id} -> {:ok, webhook_id}
+      {:error, _} = error -> error
+    end
+  end
+
+  @spec delete_webhook(String.t(), String.t()) :: {:ok, Atom.t()} | {:error, String.t()}
+  @doc """
+  Delete a webhook for a list
+  """
+  def delete_webhook(list_id, webhook_id) do
+    "/lists/#{list_id}/webhooks/#{webhook_id}.json"
+    |> Transport.request(:delete)
+    |> case do
+      {:ok, _} -> {:ok, :webhook_deleted}
+      {:error, _} = error -> error
+    end
+  end
+
   defp base_api_path, do: "/lists/#{campaign_monitor_client_id()}"
 
   defp campaign_monitor_client_id, do: Application.get_env(:ex_campaign_monitor, :client_id)
