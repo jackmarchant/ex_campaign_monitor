@@ -56,7 +56,7 @@ end
   - [x] Unsubscribing a subscriber
   - [x] Deleting a subscriber
 - [Lists](https://www.campaignmonitor.com/api/lists/)
-  - [ ] Active subscribers
+  - [x] Active subscribers
   - [x] Creating a List
   - [x] Getting list details
   - [ ] Creating a webhook
