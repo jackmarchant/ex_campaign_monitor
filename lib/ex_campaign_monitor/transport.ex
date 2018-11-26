@@ -18,7 +18,11 @@ defmodule ExCampaignMonitor.Transport do
     |> process_response()
   end
 
-  defp process_response({:ok, %HTTPoison.Response{body: body}}), do: {:ok, Jason.decode!(body)}
+  defp process_response({:ok, %HTTPoison.Response{body: body, status_code: status_code}})
+      when status_code in 200..299, do: {:ok, Jason.decode!(body)}
+  defp process_response({:ok, %HTTPoison.Response{body: body}}),
+    do: {:error, Jason.decode!(body)["Message"]}
+
   defp process_response({:error, %HTTPoison.Error{reason: reason}}), do: {:error, reason}
 
   defp token do

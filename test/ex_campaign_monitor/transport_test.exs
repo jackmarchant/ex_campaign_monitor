@@ -10,7 +10,7 @@ defmodule ExCampaignMonitorTest.TransportTest do
       http_provider()
       |> expect(:get, fn url, _headers ->
         assert url == "https://api.createsend.com/api/v3.2/some_get_path"
-        {:ok, http_response(%{"EmailAddress" => "person@email.com"})}
+        {:ok, http_response(200, %{"EmailAddress" => "person@email.com"})}
       end)
 
       assert Transport.request("/some_get_path", :get) ==
@@ -40,6 +40,15 @@ defmodule ExCampaignMonitorTest.TransportTest do
                {:error, "Something went wrong."}
     end
 
+    test "error in a successful response" do
+      http_provider()
+      |> expect(:post, fn _, _, _ ->
+        {:ok, http_response(400, %{"Message" => "Failed to deserialize your request."})}
+      end)
+
+      assert Transport.request("/some_path", :post, %{"hi" => "there"}) == {:error, "Failed to deserialize your request."}
+    end
+
     test "basic authentication" do
       http_provider()
       |> expect(:get, fn _url, headers ->
@@ -58,9 +67,9 @@ defmodule ExCampaignMonitorTest.TransportTest do
 
   defp http_provider, do: Application.get_env(:ex_campaign_monitor, :http_provider)
 
-  defp http_response(body \\ %{email: "hi"}) do
+  defp http_response(status_code \\ 200, body \\ %{email: "hi"}) do
     %HTTPoison.Response{
-      status_code: 200,
+      status_code: status_code,
       request_url: "https://api.createsend.com/api/v3.2/some_path",
       body: Jason.encode!(body),
       headers: ["Content-Type": "application/json"]
