@@ -4,7 +4,7 @@ defmodule ExCampaignMonitor.MixProject do
   def project do
     [
       app: :ex_campaign_monitor,
-      version: "0.7.0",
+      version: "0.7.1",
       elixir: "~> 1.6",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -37,7 +37,7 @@ defmodule ExCampaignMonitor.MixProject do
       {:httpoison, "~> 1.2"},
       {:jason, "~> 1.1"},
       {:mox, "~> 0.4", only: :test},
-      {:ex_doc, "~> 0.18.0", only: :dev, runtime: false},
+      {:ex_doc, "~> 0.19.0", only: :dev, runtime: false},
       {:excoveralls, "~> 0.9", only: :test}
     ]
   end
