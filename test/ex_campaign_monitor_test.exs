@@ -413,6 +413,16 @@ defmodule ExCampaignMonitorTest do
 
       ExCampaignMonitor.activate_webhook(list_id, webhook_id)
     end
+  
+
+    test "activate_webhook/2 error" do
+      http_provider()
+      |> expect(:put, fn _url, _body, _headers ->
+        {:error, http_error()}
+      end)
+
+      ExCampaignMonitor.activate_webhook("invalid-list-id", "invalid-webhook-id")
+    end
 
     test "delete_webhook/2 success" do
       list_id = "a1a1a1a1"
