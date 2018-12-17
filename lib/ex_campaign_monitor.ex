@@ -158,6 +158,16 @@ defmodule ExCampaignMonitor do
   defdelegate create_webhook(list_id, events, url, payload_format \\ "json"), to: Lists
 
   @doc """
+  Activate a specific webhook, via the webhook's ID
+
+  ```elixir
+  ExCampaignMonitor.activate_webhook("a1a1a1a1", "webhook-b1b1b1b1")
+  > :ok
+  ```
+  """
+  defdelegate activate_webhook(list_id, webhook_id), to: Lists
+
+  @doc """
   Delete a webhook by webhook_id
 
   ```elixir

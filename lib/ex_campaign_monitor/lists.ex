@@ -84,6 +84,19 @@ defmodule ExCampaignMonitor.Lists do
     end
   end
 
+  @spec activate_webhook(String.t(), String.t()) :: :ok | {:error, String.t()}
+  @doc """
+  Activate a webhook for a List
+  """
+  def activate_webhook(list_id, webhook_id) do
+    "/lists/#{list_id}/webhooks/#{webhook_id}/activate"
+    |> Transport.request(:put, "")
+    |> case do
+      {:ok, _} -> :ok
+      {:error, _} = error -> error
+    end
+  end
+
   @spec delete_webhook(String.t(), String.t()) :: {:ok, Atom.t()} | {:error, String.t()}
   @doc """
   Delete a webhook for a list
