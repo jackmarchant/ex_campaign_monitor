@@ -397,6 +397,22 @@ defmodule ExCampaignMonitorTest do
                "unsupported-format"
              ) == {:error, "Something went wrong."}
     end
+    
+    
+    test "activate_webhook/2 success" do
+      list_id = "a1a1a1a1"
+      webhook_id = "982u981u298u298u2e9u289e"
+
+      http_provider()
+      |> expect(:put, fn url, body, _headers ->
+        assert url == "#{@list_by_id_url <> list_id}/webhooks/#{webhook_id}/activate.json"
+        decoded_body = Jason.decode!(body)
+        assert decoded_body == ""
+        {:ok, http_response(webhook_id)}
+      end)
+
+      ExCampaignMonitor.activate_webhook(list_id, webhook_id)
+    end
 
     test "delete_webhook/2 success" do
       list_id = "a1a1a1a1"

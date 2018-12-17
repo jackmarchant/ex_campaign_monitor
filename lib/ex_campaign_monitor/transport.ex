@@ -21,7 +21,7 @@ defmodule ExCampaignMonitor.Transport do
   
   @callback request(String.t(), Atom.t(), map()) :: {:ok, map()} | {:error, String.t()}
   def request(path, :put, body) do
-    http_provider().post(@base_api <> path, Jason.encode!(body), headers())
+    http_provider().put(@base_api <> path, Jason.encode!(body), headers())
     |> process_response()
   end
 

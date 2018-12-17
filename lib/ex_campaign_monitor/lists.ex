@@ -89,7 +89,7 @@ defmodule ExCampaignMonitor.Lists do
   Activate a webhook for a List
   """
   def activate_webhook(list_id, webhook_id) do
-    "/lists/#{list_id}/webhooks/#{webhook_id}/activate"
+    "/lists/#{list_id}/webhooks/#{webhook_id}/activate.json"
     |> Transport.request(:put, "")
     |> case do
       {:ok, _} -> :ok
