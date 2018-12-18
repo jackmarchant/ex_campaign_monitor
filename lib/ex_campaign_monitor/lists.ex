@@ -13,7 +13,7 @@ defmodule ExCampaignMonitor.Lists do
   @doc """
   Create a new list
 
-  Must provide a :title`, and optionally:
+  Must provide a :title, and optionally:
     * :unsubscribe_page
     * :unsubscribe_setting
     * :confirmed_opt_in
