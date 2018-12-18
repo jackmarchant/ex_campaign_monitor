@@ -166,6 +166,27 @@ defmodule ExCampaignMonitor do
   ```
   """
   defdelegate activate_webhook(list_id, webhook_id), to: Lists
+  
+  @doc """ 
+  List all webhooks created for the list ID provided.
+
+  ```elixir
+  ExCampaignMonitor.list_webhooks("a1a1a1a1")
+  > {:ok, [
+      %{
+        "WebhookID": "ee1b3864e5ca61618q98su98qsu9q",
+        "Events": [
+            "Subscribe"
+        ],
+        "Url": "http://example.com/subscribe",
+        "Status": "Active",
+        "PayloadFormat": "Json"
+      }
+    ]
+  }
+  ```
+  """
+  defdelegate list_webhooks(list_id), to: Lists
 
   @doc """
   Delete a webhook by webhook_id
