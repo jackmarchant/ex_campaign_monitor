@@ -28,9 +28,14 @@ defmodule ExCampaignMonitor.Subscribers do
   @doc """
   Update a subscriber
   """
-  def update_subscriber(%{old_email: old_email, new_email: new_email, consent_to_track: ctt}) do
+  def update_subscriber(subscriber = %{
+    old_email: old_email, 
+    new_email: new_email, 
+    consent_to_track: ctt
+  }) do
+    updated = Map.put(subscriber, :email, new_email)
     "#{base_api_path()}.json?email=#{old_email}"
-    |> Transport.request(:put, Subscriber.to_cm(%{email: new_email, consent_to_track: ctt}))
+    |> Transport.request(:put, Subscriber.to_cm(updated))
     |> case do
       {:ok, _} -> {:ok, %Subscriber{email: new_email, consent_to_track: ctt}}
       {:error, _} = error -> error
