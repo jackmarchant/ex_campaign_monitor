@@ -8,7 +8,7 @@ defmodule ExCampaignMonitor.Lists do
   ```
   """
 
-  alias ExCampaignMonitor.{Transport, List}
+  alias ExCampaignMonitor.{Transport, List, Webhook}
 
   @doc """
   Create a new list
@@ -81,6 +81,32 @@ defmodule ExCampaignMonitor.Lists do
     |> case do
       {:ok, webhook_id} -> {:ok, webhook_id}
       {:error, _} = error -> error
+    end
+  end
+
+  @spec activate_webhook(String.t(), String.t()) :: :ok | {:error, String.t()}
+  @doc """
+  Activate a webhook for a List
+  """
+  def activate_webhook(list_id, webhook_id) do
+    "/lists/#{list_id}/webhooks/#{webhook_id}/activate.json"
+    |> Transport.request(:put, "")
+    |> case do
+      {:ok, _} -> :ok
+      {:error, _} = error -> error
+    end
+  end
+
+  @spec list_webhooks(String.t()) :: {:ok, list()} | {:error, String.t()}
+  @doc """
+  Get a list of all webhooks for a List
+  """
+  def list_webhooks(list_id) do
+    "/lists/#{list_id}/webhooks.json"
+    |> Transport.request(:get)
+    |> case do
+      {:ok, response} -> {:ok, Enum.map(response, &Webhook.from_cm/1)}
+      error -> error
     end
   end
 

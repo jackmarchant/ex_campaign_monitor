@@ -397,6 +397,72 @@ defmodule ExCampaignMonitorTest do
                "unsupported-format"
              ) == {:error, "Something went wrong."}
     end
+    
+    
+    test "activate_webhook/2 success" do
+      list_id = "a1a1a1a1"
+      webhook_id = "982u981u298u298u2e9u289e"
+
+      http_provider()
+      |> expect(:put, fn url, body, _headers ->
+        assert url == "#{@list_by_id_url <> list_id}/webhooks/#{webhook_id}/activate.json"
+        decoded_body = Jason.decode!(body)
+        assert decoded_body == ""
+        {:ok, http_response(webhook_id)}
+      end)
+
+      ExCampaignMonitor.activate_webhook(list_id, webhook_id)
+    end
+  
+
+    test "activate_webhook/2 error" do
+      http_provider()
+      |> expect(:put, fn _url, _body, _headers ->
+        {:error, http_error()}
+      end)
+
+      ExCampaignMonitor.activate_webhook("invalid-list-id", "invalid-webhook-id")
+    end
+
+    test "list_webhooks/1 success" do
+      list_id = "a1a1a1a1"
+
+      http_provider()
+      |> expect(:get, fn url, _headers ->
+        assert url == @list_by_id_url <> list_id <> "/webhooks.json"
+        {:ok, 
+          http_response([
+            %{
+              "WebhookID" => "ee1b3864e5ca61618q98su98qsu9q",
+              "Events" => ["Subscribe"],
+              "Url" => "http://example.com/subscribe",
+              "Status" => "Active",
+              "PayloadFormat" => "Json"
+            }
+          ])
+        }
+      end)
+
+      {:ok, result} = ExCampaignMonitor.list_webhooks(list_id)
+      assert result == [
+        %ExCampaignMonitor.Webhook{
+          id: "ee1b3864e5ca61618q98su98qsu9q",
+          events: ["Subscribe"],
+          url: "http://example.com/subscribe",
+          status: "Active",
+          payload_format: "Json"
+        }
+      ]
+    end
+
+    test "list_webhooks/1 error" do
+      http_provider()
+      |> expect(:get, fn _url, _headers -> 
+        {:error, http_error()}
+      end)
+
+      assert {:error, "Something went wrong."} == ExCampaignMonitor.list_webhooks("invalid-list-id")
+    end
 
     test "delete_webhook/2 success" do
       list_id = "a1a1a1a1"

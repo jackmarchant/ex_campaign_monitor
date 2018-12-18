@@ -18,6 +18,13 @@ defmodule ExCampaignMonitor.Transport do
     |> process_response()
   end
 
+  
+  @callback request(String.t(), Atom.t(), map()) :: {:ok, map()} | {:error, String.t()}
+  def request(path, :put, body) do
+    http_provider().put(@base_api <> path, Jason.encode!(body), headers())
+    |> process_response()
+  end
+
   defp process_response({:ok, %HTTPoison.Response{body: body, status_code: status_code}})
       when status_code in 200..299, do: {:ok, Jason.decode!(body)}
   defp process_response({:ok, %HTTPoison.Response{body: body}}),
