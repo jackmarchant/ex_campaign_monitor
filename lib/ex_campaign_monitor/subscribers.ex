@@ -30,7 +30,7 @@ defmodule ExCampaignMonitor.Subscribers do
   """
   def update_subscriber(%{old_email: old_email, new_email: new_email, consent_to_track: ctt}) do
     "#{base_api_path()}.json?email=#{old_email}"
-    |> Transport.request(:post, Subscriber.to_cm(%{email: new_email, consent_to_track: ctt}))
+    |> Transport.request(:put, Subscriber.to_cm(%{email: new_email, consent_to_track: ctt}))
     |> case do
       {:ok, _} -> {:ok, %Subscriber{email: new_email, consent_to_track: ctt}}
       {:error, _} = error -> error
