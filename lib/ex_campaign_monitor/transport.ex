@@ -13,20 +13,16 @@ defmodule ExCampaignMonitor.Transport do
   end
 
   @callback request(String.t(), Atom.t(), map()) :: {:ok, map()} | {:error, String.t()}
-  def request(path, :post, body) do
-    http_provider().post(@base_api <> path, Jason.encode!(body), headers())
+  def request(path, type, body) when type in [:post, :put] do
+    http_provider()
+    |> apply(type, [@base_api <> path, Jason.encode!(body), headers()])
     |> process_response()
   end
 
-  
-  @callback request(String.t(), Atom.t(), map()) :: {:ok, map()} | {:error, String.t()}
-  def request(path, :put, body) do
-    http_provider().put(@base_api <> path, Jason.encode!(body), headers())
-    |> process_response()
-  end
-
+  defp process_response({:ok, %HTTPoison.Response{body: "", status_code: status_code}})
+  when status_code in 200..299, do: {:ok, ""}
   defp process_response({:ok, %HTTPoison.Response{body: body, status_code: status_code}})
-      when status_code in 200..299, do: {:ok, Jason.decode!(body)}
+  when status_code in 200..299, do: {:ok, Jason.decode!(body)}
   defp process_response({:ok, %HTTPoison.Response{body: body}}),
     do: {:error, Jason.decode!(body)["Message"]}
 

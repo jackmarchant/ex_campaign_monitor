@@ -83,7 +83,7 @@ defmodule ExCampaignMonitorTest do
 
     test "update_subscriber/1" do
       http_provider()
-      |> expect(:post, fn url, body, _headers ->
+      |> expect(:put, fn url, body, _headers ->
         assert url == @subscribers_url <> ".json?email=#{@subscriber_email}"
         decoded_body = Jason.decode!(body)
 
@@ -102,7 +102,7 @@ defmodule ExCampaignMonitorTest do
 
     test "update_subscriber/1 error" do
       http_provider()
-      |> expect(:post, fn _url, _body, _headers ->
+      |> expect(:put, fn _url, _body, _headers ->
         {:error, http_error()}
       end)
 
