@@ -10,6 +10,7 @@ defmodule ExCampaignMonitorTest do
   @subscribers_url "https://api.createsend.com/api/v3.2/subscribers/test_list_id"
   @lists_url "https://api.createsend.com/api/v3.2/lists/test_client_id"
   @list_by_id_url "https://api.createsend.com/api/v3.2/lists/"
+  @transactional_url "https://api.createsend.com/api/v3.2/transactional"
 
   describe "ExCampaignMonitor Subscribers" do
     setup :verify_on_exit!
@@ -487,6 +488,50 @@ defmodule ExCampaignMonitorTest do
       assert ExCampaignMonitor.delete_webhook("list-id-does-not-exist", "webhook-id-invalid") ==
                {:error, "Something went wrong."}
     end
+  end
+ 
+  test "send_smart_email/2 success" do
+    smart_email_id = "a1a1a1a1"
+    data = %{
+      data: %{username: "jack"},
+      to: "jack@jackmarchant.com"
+    }
+
+    http_provider()
+    |> expect(:post, fn url, body, _headers ->
+      assert url == @transactional_url <> "/smartEmail/#{smart_email_id}/send"
+      assert body == Jason.encode!(%{
+        "Data" => data.data,
+        "To" => data.to 
+      })
+      
+      {:ok, 
+        http_response(%{
+          "MessageID" => "ee1b3864e5ca61618q98su98qsu9q",
+          "Status" => "Accepted",
+          "Recipient" => "jack@jackmarchant.com"
+        })
+      }
+    end)
+
+    {:ok, result} = ExCampaignMonitor.send_smart_email(smart_email_id, data)
+    assert result == %ExCampaignMonitor.Transactional.SmartEmail{
+      data: nil,
+      message_id: "ee1b3864e5ca61618q98su98qsu9q",
+      status: "Accepted",
+      to: "jack@jackmarchant.com"
+    }
+  end
+
+
+  test "send_smart_email/2 error" do
+    http_provider()
+    |> expect(:post, fn _url, _body, _headers ->
+      {:error, http_error()}
+    end)
+
+    assert ExCampaignMonitor.send_smart_email("a1a1a1a1", %{data: %{}, to: nil}) 
+    == {:error, "Something went wrong."}
   end
 
   defp http_provider, do: Application.get_env(:ex_campaign_monitor, :http_provider)

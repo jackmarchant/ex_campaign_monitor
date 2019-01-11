@@ -32,7 +32,8 @@ defmodule ExCampaignMonitor do
     end
   end
   """
-  alias ExCampaignMonitor.{Subscribers, Lists}
+  
+  alias ExCampaignMonitor.{Lists, Subscribers, Transactional}
 
   ###
   ### Subscribers
@@ -197,4 +198,16 @@ defmodule ExCampaignMonitor do
   ```
   """
   defdelegate delete_webhook(list_id, webhook_id), to: Lists
+  
+  @doc """
+  Send a transactional smart email
+
+  ```elixir
+  ExCampaignMonitor.send_smart_email("a1a1a1a1", %{
+    to: ["jack@jackmarchant.com"],
+    data: %{new_password_url: "https://mywebapp.com/newpwd?uid=jguf45h74gf"}
+  })
+  ```
+  """
+  defdelegate send_smart_email(smart_email_id, data), to: Transactional
 end
