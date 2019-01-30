@@ -7,14 +7,16 @@ defmodule ExCampaignMonitor.Transactional.SmartEmailTest do
     test "can convert to CM params" do
       assert SmartEmail.to_cm(%{
         data: %{username: "jack"}, 
-        to: "jack@jackmarchant.com"
+        to: "jack@jackmarchant.com",
+        consent_to_track: "Yes"
       }) == %{
         "Data" => %{username: "jack"}, 
-        "To" => "jack@jackmarchant.com"
+        "To" => "jack@jackmarchant.com",
+        "ConsentToTrack" => "Yes"
       }
     end
 
-    test "can conver from CM response" do
+    test "can convert from CM response" do
       assert SmartEmail.from_cm(%{
         "Status" => "Accepted",
         "MessageID" => "a1a1a1a1",
@@ -23,7 +25,8 @@ defmodule ExCampaignMonitor.Transactional.SmartEmailTest do
         data: nil,
         status: "Accepted",
         message_id: "a1a1a1a1",
-        to: "jack@jackmarchant.com"
+        to: "jack@jackmarchant.com",
+        consent_to_track: nil
       }
     end
   end

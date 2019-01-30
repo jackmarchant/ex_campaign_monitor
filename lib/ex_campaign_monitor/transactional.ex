@@ -12,7 +12,7 @@ defmodule ExCampaignMonitor.Transactional do
     "/transactional/smartEmail/#{smart_email_id}/send"
     |> Transport.request(:post, SmartEmail.to_cm(data))
     |> case do
-      {:ok, response} -> {:ok, SmartEmail.from_cm(response)}
+      {:ok, response} -> {:ok, Enum.map(response, &SmartEmail.from_cm/1)}
       {:error, _} = error -> error
     end
   end
