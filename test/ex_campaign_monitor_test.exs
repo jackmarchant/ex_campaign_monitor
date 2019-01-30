@@ -494,7 +494,8 @@ defmodule ExCampaignMonitorTest do
     smart_email_id = "a1a1a1a1"
     data = %{
       data: %{username: "jack"},
-      to: "jack@jackmarchant.com"
+      to: "jack@jackmarchant.com",
+      consent_to_track: "yes"
     }
 
     http_provider()
@@ -502,25 +503,27 @@ defmodule ExCampaignMonitorTest do
       assert url == @transactional_url <> "/smartEmail/#{smart_email_id}/send"
       assert body == Jason.encode!(%{
         "Data" => data.data,
-        "To" => data.to 
+        "To" => data.to,
+        "ConsentToTrack" => "yes"
       })
       
       {:ok, 
-        http_response(%{
+        http_response([%{
           "MessageID" => "ee1b3864e5ca61618q98su98qsu9q",
           "Status" => "Accepted",
           "Recipient" => "jack@jackmarchant.com"
-        })
+        }])
       }
     end)
 
     {:ok, result} = ExCampaignMonitor.send_smart_email(smart_email_id, data)
-    assert result == %ExCampaignMonitor.Transactional.SmartEmail{
+    assert result == [%ExCampaignMonitor.Transactional.SmartEmail{
       data: nil,
       message_id: "ee1b3864e5ca61618q98su98qsu9q",
       status: "Accepted",
-      to: "jack@jackmarchant.com"
-    }
+      to: "jack@jackmarchant.com",
+      consent_to_track: nil
+    }]
   end
 
 
@@ -530,7 +533,7 @@ defmodule ExCampaignMonitorTest do
       {:error, http_error()}
     end)
 
-    assert ExCampaignMonitor.send_smart_email("a1a1a1a1", %{data: %{}, to: nil}) 
+    assert ExCampaignMonitor.send_smart_email("a1a1a1a1", %{data: %{}, to: nil, consent_to_track: nil}) 
     == {:error, "Something went wrong."}
   end
 
