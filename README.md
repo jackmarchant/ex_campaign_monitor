@@ -63,5 +63,5 @@ end
   - [x] Activate a webhook
   - [x] Creating a webhook
   - [x] Deleting a webhook
-### [Transactional] (https://www.campaignmonitor.com/api/transactional)
+### [Transactional](https://www.campaignmonitor.com/api/transactional)
  - [x] Smart email
