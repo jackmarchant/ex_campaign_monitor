@@ -48,14 +48,14 @@ end
 ```
 
 ## Features
-- [Subscribers](https://www.campaignmonitor.com/api/subscribers/)
+### [Subscribers](https://www.campaignmonitor.com/api/subscribers/)
   - [x] Adding a subscriber
   - [x] Updating a subscriber
   - [x] Importing many subscribers
   - [x] Getting a subscriber
   - [x] Unsubscribing a subscriber
   - [x] Deleting a subscriber
-- [Lists](https://www.campaignmonitor.com/api/lists/)
+### [Lists](https://www.campaignmonitor.com/api/lists/)
   - [x] Active subscribers
   - [x] Creating a List
   - [x] Getting list details
@@ -63,5 +63,5 @@ end
   - [x] Activate a webhook
   - [x] Creating a webhook
   - [x] Deleting a webhook
- - [Transactional] (https://www.campaignmonitor.com/api/transactional)
-  - [x] Smart email
+### [Transactional] (https://www.campaignmonitor.com/api/transactional)
+ - [x] Smart email
