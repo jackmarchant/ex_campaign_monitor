@@ -7,11 +7,17 @@ defmodule ExCampaignMonitor.Transactional.SmartEmailTest do
     test "can convert to CM params" do
       assert SmartEmail.to_cm(%{
         data: %{username: "jack"}, 
-        to: "jack@jackmarchant.com",
+        to: ["Jack Marchant <jack@jackmarchant.com>"],
+        bcc: ["Joe Blogs <joe@blogs.com>"],
+        cc: ["Richard Hendrix <richard@piedpiper.net>"],
+        add_recipients_to_list: true,
         consent_to_track: "Yes"
       }) == %{
         "Data" => %{username: "jack"}, 
-        "To" => "jack@jackmarchant.com",
+        "To" => ["Jack Marchant <jack@jackmarchant.com>"],
+        "BCC" => ["Joe Blogs <joe@blogs.com>"],
+        "CC" => ["Richard Hendrix <richard@piedpiper.net>"],
+        "AddRecipientsToList" => true,
         "ConsentToTrack" => "Yes"
       }
     end

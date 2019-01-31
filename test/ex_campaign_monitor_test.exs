@@ -494,7 +494,9 @@ defmodule ExCampaignMonitorTest do
     smart_email_id = "a1a1a1a1"
     data = %{
       data: %{username: "jack"},
-      to: "jack@jackmarchant.com",
+      to: ["Jack Marchant <jack@jackmarchant.com>"],
+      bcc: ["Joe Blogs <joe@blogs.com>"],
+      add_recipients_to_list: true,
       consent_to_track: "yes"
     }
 
@@ -504,6 +506,9 @@ defmodule ExCampaignMonitorTest do
       assert body == Jason.encode!(%{
         "Data" => data.data,
         "To" => data.to,
+        "CC" => nil,
+        "BCC" => data.bcc,
+        "AddRecipientsToList" => true,
         "ConsentToTrack" => "yes"
       })
       

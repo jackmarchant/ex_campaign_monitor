@@ -3,7 +3,7 @@ defmodule ExCampaignMonitor.Transactional.SmartEmail do
   Representation of a Smart Email
   """
 
-  defstruct [:data, :to, :consent_to_track, :status, :message_id]
+  defstruct [:data, :to, :cc, :bcc, :add_recipients_to_list, :consent_to_track, :status, :message_id]
   
   @doc "Create a new SmartEmail struct"
   def new(params) do
@@ -11,11 +11,15 @@ defmodule ExCampaignMonitor.Transactional.SmartEmail do
   end
   
   @doc "Converts a map to a format CM understands"
-  def to_cm(%{data: data, to: to, consent_to_track: consent}) do
+  def to_cm(params) do
+    smart_email = new(params)
     %{
-      "Data" => data,
-      "To" => to,
-      "ConsentToTrack" => consent
+      "Data" => smart_email.data,
+      "To" => smart_email.to,
+      "CC" => smart_email.cc,
+      "BCC" => smart_email.bcc,
+      "AddRecipientsToList" => smart_email.add_recipients_to_list,
+      "ConsentToTrack" => smart_email.consent_to_track,
     }
   end
   
