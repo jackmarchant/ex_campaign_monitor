@@ -4,7 +4,7 @@ defmodule ExCampaignMonitor.MixProject do
   def project do
     [
       app: :ex_campaign_monitor,
-      version: "0.9.3",
+      version: "0.9.4",
       elixir: "~> 1.6",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
