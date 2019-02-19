@@ -65,7 +65,9 @@ defmodule ExCampaignMonitorTest.SubscriberTest do
                email: "jack@jackmarchant.com",
                consent_to_track: "No",
                name: "Jack Marchant",
-               custom_fields: custom_fields
+               custom_fields: custom_fields,
+               resubscribe: true,
+               restart_subscription_based_autoresponders: false
              }) == %{
                "EmailAddress" => "jack@jackmarchant.com",
                "ConsentToTrack" => "No",
@@ -79,7 +81,9 @@ defmodule ExCampaignMonitorTest.SubscriberTest do
                    "Key" => "interests",
                    "Value" => "Elixir"
                  }
-               ]
+               ],
+               "Resubscribe" => true,
+               "RestartSubscriptionBasedAutoresponders" => false
              }
     end
   end
