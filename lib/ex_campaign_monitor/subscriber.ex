@@ -1,5 +1,13 @@
 defmodule ExCampaignMonitor.Subscriber do
-  defstruct [:email, :name, :custom_fields, :consent_to_track, :state]
+  defstruct [
+    :email, 
+    :name, 
+    :custom_fields, 
+    :consent_to_track, 
+    :state,
+    :resubscribe,
+    :restart_subscription_based_autoresponders
+  ]
 
   @doc """
   Create a new subscriber struct
@@ -28,13 +36,22 @@ defmodule ExCampaignMonitor.Subscriber do
   end
 
   def to_cm(subscriber) do
-    params = Map.take(subscriber, [:email, :name, :custom_fields, :consent_to_track])
+    params = Map.take(subscriber, [
+      :email, 
+      :name, 
+      :custom_fields, 
+      :consent_to_track, 
+      :resubscribe, 
+      :restart_subscription_based_autoresponders
+    ])
 
     %{
       "EmailAddress" => params[:email],
       "ConsentToTrack" => params[:consent_to_track],
       "Name" => params[:name],
-      "CustomFields" => convert_keys(params[:custom_fields], &key_to_string/1)
+      "CustomFields" => convert_keys(params[:custom_fields], &key_to_string/1),
+      "Resubscribe" => params[:resubscribe],
+      "RestartSubscriptionBasedAutoresponders" => params[:restart_subscription_based_autoresponders]
     }
     |> Enum.filter(fn {_, v} -> v != nil end)
     |> Enum.into(%{})
