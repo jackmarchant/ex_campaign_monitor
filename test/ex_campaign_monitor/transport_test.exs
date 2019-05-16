@@ -10,7 +10,7 @@ defmodule ExCampaignMonitorTest.TransportTest do
       http_provider()
       |> expect(:get, fn url, _headers ->
         assert url == "https://api.createsend.com/api/v3.2/some_get_path"
-        {:ok, http_response(200, %{"EmailAddress" => "person@email.com"})}
+        {:ok, http_response(200, Jason.encode!(%{"EmailAddress" => "person@email.com"}))}
       end)
 
       assert Transport.request("/some_get_path", :get) ==
@@ -27,7 +27,7 @@ defmodule ExCampaignMonitorTest.TransportTest do
       end)
 
       assert Transport.request("/some_path", :post, %{"hello" => "world"}) ==
-               {:ok, %{"email" => "hi"}}
+               {:ok, %{"email" => "email@email.com"}}
     end
 
     test "request/2 error" do
@@ -43,7 +43,7 @@ defmodule ExCampaignMonitorTest.TransportTest do
     test "error in a successful response" do
       http_provider()
       |> expect(:post, fn _, _, _ ->
-        {:ok, http_response(400, %{"Message" => "Failed to deserialize your request."})}
+        {:ok, http_response(400, Jason.encode!(%{"Message" => "Failed to deserialize your request."}))}
       end)
 
       assert Transport.request("/some_path", :post, %{"hi" => "there"}) == {:error, "Failed to deserialize your request."}
@@ -63,15 +63,24 @@ defmodule ExCampaignMonitorTest.TransportTest do
 
       Transport.request("/testing-auth", :get)
     end
+    
+    test "error where the response is not JSON" do
+      http_provider()
+      |> expect(:get, fn _, _ ->
+        {:ok, http_response(400, "Bad request")} 
+      end)
+
+      assert Transport.request("/some_path", :get) == {:error, "Bad request"}
+    end
   end
 
   defp http_provider, do: Application.get_env(:ex_campaign_monitor, :http_provider)
 
-  defp http_response(status_code \\ 200, body \\ %{email: "hi"}) do
+  defp http_response(status_code \\ 200, body \\ Jason.encode!(%{email: "email@email.com"})) do
     %HTTPoison.Response{
       status_code: status_code,
       request_url: "https://api.createsend.com/api/v3.2/some_path",
-      body: Jason.encode!(body),
+      body: body,
       headers: ["Content-Type": "application/json"]
     }
   end
